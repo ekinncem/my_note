@@ -229,6 +229,51 @@ class _NoteHomeState extends State<NoteHome> {
     );
   }
 
+  void _editNoteDialog(Note note) {
+    final titleController = TextEditingController(text: note.title);
+    final contentController = TextEditingController(text: note.content);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Note'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: contentController,
+                decoration: InputDecoration(labelText: 'Content'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  note.title = titleController.text;
+                  note.content = contentController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredNotes = _selectedFilter == 'All'
@@ -390,10 +435,10 @@ class _NoteHomeState extends State<NoteHome> {
                                           : note.priority == 'Medium'
                                               ? Colors.orange
                                               : Colors.green,
-                                      size: 14,
+                                      size: 16,
                                     ),
                                     Transform.scale(
-                                      scale: 0.6,
+                                      scale: 0.8,
                                       child: Checkbox(
                                         value: note.isCompleted,
                                         onChanged: (value) {
@@ -409,7 +454,7 @@ class _NoteHomeState extends State<NoteHome> {
                                 Text(
                                   note.title,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     decoration: note.isCompleted
                                         ? TextDecoration.lineThrough
@@ -423,7 +468,7 @@ class _NoteHomeState extends State<NoteHome> {
                                   child: Text(
                                     note.content,
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: 11,
                                       decoration: note.isCompleted
                                           ? TextDecoration.lineThrough
                                           : null,
@@ -438,7 +483,7 @@ class _NoteHomeState extends State<NoteHome> {
                                     Text(
                                       DateFormat('MMM dd').format(note.dateCreated),
                                       style: const TextStyle(
-                                        fontSize: 9,
+                                        fontSize: 10,
                                         color: Colors.grey,
                                       ),
                                     ),
@@ -446,17 +491,17 @@ class _NoteHomeState extends State<NoteHome> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         IconButton(
-                                          iconSize: 14,
+                                          iconSize: 16,
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(),
                                           icon: const Icon(Icons.edit),
                                           onPressed: () {
-                                            // Implement edit functionality
+                                            _editNoteDialog(note);
                                           },
                                         ),
                                         const SizedBox(width: 2),
                                         IconButton(
-                                          iconSize: 14,
+                                          iconSize: 16,
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(),
                                           icon: const Icon(Icons.delete),
