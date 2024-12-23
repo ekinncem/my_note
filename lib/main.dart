@@ -9,21 +9,20 @@ class MyNoteApp extends StatelessWidget {
   const MyNoteApp({super.key});
 
   @override
-Widget build(BuildContext context) {
-  return MaterialApp(
-    title: 'My Note',
-    theme: ThemeData.dark().copyWith(
-      primaryColor: Colors.blue,
-      colorScheme: ColorScheme.dark(
-        primary: Colors.blue,
-        secondary: Colors.cyan,
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'My Note',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blue,
+        colorScheme: ColorScheme.dark(
+          primary: Colors.blue,
+          secondary: Colors.cyan,
+        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    ),
-    home: const NoteHome(),
-  );
-}
-
+      home: const NoteHome(),
+    );
+  }
 }
 
 class NoteHome extends StatefulWidget {
@@ -72,6 +71,21 @@ class _NoteHomeState extends State<NoteHome> {
     }
   }
 
+  Color _getRandomColor() {
+    final random = DateTime.now().millisecondsSinceEpoch;
+    final colors = [
+      Colors.blue.withOpacity(0.2),
+      Colors.green.withOpacity(0.2),
+      Colors.purple.withOpacity(0.2),
+      Colors.orange.withOpacity(0.2),
+      Colors.pink.withOpacity(0.2),
+      Colors.teal.withOpacity(0.2),
+      Colors.indigo.withOpacity(0.2),
+      Colors.cyan.withOpacity(0.2),
+    ];
+    return colors[random % colors.length];
+  }
+
   void _showNoteDialog() {
     final titleController = TextEditingController();
     final contentController = TextEditingController();
@@ -80,35 +94,57 @@ class _NoteHomeState extends State<NoteHome> {
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Note'),
-          content: SingleChildScrollView(
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            width: MediaQuery.of(context).size.width * 0.8,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text(
+                  'Create New Note',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: titleController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Title',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.title),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: contentController,
                   maxLines: 3,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Content',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.note),
                   ),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: selectedCategory,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Category',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.category),
                   ),
                   items: _categories
                       .where((category) => category != 'All')
@@ -125,11 +161,16 @@ class _NoteHomeState extends State<NoteHome> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: selectedPriority,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Priority',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.priority_high),
                   ),
-                  items: _priorities.map((priority) {
+                  items: _priorities
+                      .where((priority) => priority != 'All')
+                      .map((priority) {
                     return DropdownMenuItem(
                       value: priority,
                       child: Text(priority),
@@ -139,33 +180,50 @@ class _NoteHomeState extends State<NoteHome> {
                     selectedPriority = value!;
                   },
                 ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.add),
+                      label: const Text('Create Note'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (titleController.text.isNotEmpty) {
+                          setState(() {
+                            _notes.add(Note(
+                              title: titleController.text,
+                              content: contentController.text,
+                              dateCreated: DateTime.now(),
+                              category: selectedCategory,
+                              priority: selectedPriority,
+                              color: _getRandomColor(),
+                            ));
+                            print('Note added: ${titleController.text}');
+                            print('Total notes: ${_notes.length}');
+                          });
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('CANCEL'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (titleController.text.isNotEmpty) {
-                  setState(() {
-                    _notes.add(Note(
-                      title: titleController.text,
-                      content: contentController.text,
-                      dateCreated: DateTime.now(),
-                      category: selectedCategory,
-                      priority: selectedPriority,
-                      color: _getCategoryColor(selectedCategory),
-                    ));
-                  });
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('ADD'),
-            ),
-          ],
         );
       },
     );
@@ -175,63 +233,83 @@ class _NoteHomeState extends State<NoteHome> {
   Widget build(BuildContext context) {
     final filteredNotes = _selectedFilter == 'All'
         ? _notes
-        : _selectedFilter.contains('Low') || _selectedFilter.contains('Medium') || _selectedFilter.contains('High')
+        : _selectedFilter.contains('Low') ||
+                _selectedFilter.contains('Medium') ||
+                _selectedFilter.contains('High')
             ? _notes.where((note) => note.priority == _selectedFilter).toList()
             : _notes.where((note) => note.category == _selectedFilter).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Notes'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                ..._categories.map((category) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ChoiceChip(
-                      label: Text(category),
-                      selected: _selectedFilter == category,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedFilter = category;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-                ..._priorities.map((priority) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ChoiceChip(
-                      label: Text(priority),
-                      selected: _selectedFilter == priority,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedFilter = priority;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
+        title: const Text(
+          'My Notes',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search notes...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ..._categories.map((category) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: Text(category),
+                        selected: _selectedFilter == category,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedFilter = category;
+                          });
+                        },
+                        avatar: Icon(
+                          category == 'Home'
+                              ? Icons.home
+                              : category == 'Work'
+                                  ? Icons.work
+                                  : category == 'Personal'
+                                      ? Icons.person
+                                      : Icons.all_inbox,
+                        ),
+                      ),
+                    );
+                  }),
+                  ..._priorities.map((priority) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: Text(priority),
+                        selected: _selectedFilter == priority,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedFilter = priority;
+                          });
+                        },
+                        avatar: Icon(
+                          priority == 'High'
+                              ? Icons.warning
+                              : priority == 'Medium'
+                                  ? Icons.priority_high
+                                  : priority == 'Low'
+                                      ? Icons.low_priority
+                                      : Icons.all_inbox,
+                          color: priority == 'High'
+                              ? Colors.red
+                              : priority == 'Medium'
+                                  ? Colors.orange
+                                  : priority == 'Low'
+                                      ? Colors.green
+                                      : null,
+                        ),
+                      ),
+                    );
+                  }),
+                ],
               ),
             ),
           ),
@@ -241,6 +319,11 @@ class _NoteHomeState extends State<NoteHome> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        const Icon(
+                          Icons.note_add,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(height: 16),
                         const Text(
                           "You don't have any notes",
@@ -249,73 +332,146 @@ class _NoteHomeState extends State<NoteHome> {
                             color: Colors.grey,
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.add),
+                          label: const Text('Create Your First Note'),
+                          onPressed: _showNoteDialog,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16.0),
+                : GridView.builder(
+                    padding: const EdgeInsets.all(2),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 6,
+                      childAspectRatio: 0.8,
+                      crossAxisSpacing: 2,
+                      mainAxisSpacing: 2,
+                    ),
                     itemCount: filteredNotes.length,
                     itemBuilder: (context, index) {
                       final note = filteredNotes[index];
                       return Card(
-                        color: note.color.withOpacity(0.2),
-                        child: ListTile(
-                          leading: Checkbox(
-                            value: note.isCompleted,
-                            onChanged: (value) {
-                              setState(() {
-                                note.isCompleted = value!;
-                              });
-                            },
-                          ),
-                          title: Text(
-                            note.title,
-                            style: TextStyle(
-                              decoration: note.isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : null,
+                        elevation: 4,
+                        color: note.color,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            // Implement note details view
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(2),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Icon(
+                                      note.priority == 'High'
+                                          ? Icons.warning
+                                          : note.priority == 'Medium'
+                                              ? Icons.priority_high
+                                              : Icons.low_priority,
+                                      color: note.priority == 'High'
+                                          ? Colors.red
+                                          : note.priority == 'Medium'
+                                              ? Colors.orange
+                                              : Colors.green,
+                                      size: 14,
+                                    ),
+                                    Transform.scale(
+                                      scale: 0.6,
+                                      child: Checkbox(
+                                        value: note.isCompleted,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            note.isCompleted = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  note.title,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: note.isCompleted
+                                        ? TextDecoration.lineThrough
+                                        : null,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 1),
+                                Expanded(
+                                  child: Text(
+                                    note.content,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      decoration: note.isCompleted
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      DateFormat('MMM dd').format(note.dateCreated),
+                                      style: const TextStyle(
+                                        fontSize: 9,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          iconSize: 14,
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () {
+                                            // Implement edit functionality
+                                          },
+                                        ),
+                                        const SizedBox(width: 2),
+                                        IconButton(
+                                          iconSize: 14,
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () {
+                                            setState(() {
+                                              _notes.remove(note);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                note.content,
-                                style: TextStyle(
-                                  decoration: note.isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                DateFormat('MMM dd, yyyy')
-                                    .format(note.dateCreated),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  // Implement edit functionality
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () {
-                                  setState(() {
-                                    _notes.remove(note);
-                                  });
-                                },
-                              ),
-                            ],
                           ),
                         ),
                       );
@@ -324,10 +480,13 @@ class _NoteHomeState extends State<NoteHome> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showNoteDialog,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _notes.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: _showNoteDialog,
+              label: const Text('Create Note'),
+              icon: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
