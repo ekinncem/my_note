@@ -36,25 +36,6 @@ class _NoteHomeState extends State<NoteHome> {
   final TextEditingController noteController = TextEditingController();
   List<String> notes = []; // Notları saklamak için liste
 
-  void _addNote() {
-    String note = noteController.text;
-    if (note.isNotEmpty) {
-      setState(() {
-        notes.add(note);
-      });
-      noteController.clear();
-    }
-  }
-
-  void _deleteNote() {
-    if (notes.isNotEmpty) {
-      setState(() {
-        notes.removeLast();
-      });
-      noteController.clear();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,18 +58,25 @@ class _NoteHomeState extends State<NoteHome> {
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: _addNote,
-                  child: const Text('Save'),
-                ),
-                ElevatedButton(
-                  onPressed: _deleteNote,
-                  child: const Text('Delete'),
-                ),
-              ],
+            ElevatedButton(
+              onPressed: () {
+                // Create a new note with date and time
+                String note = noteController.text;
+                if (note.isNotEmpty) {
+                  String dateTime = DateTime.now().toString();
+                  setState(() {
+                    notes.add('[$dateTime] $note');
+                  });
+                  noteController.clear();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.cyan,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+              child: const Text('Create New Note'),
             ),
             const SizedBox(height: 16),
             Expanded(
