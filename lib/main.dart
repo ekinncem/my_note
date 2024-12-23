@@ -38,6 +38,7 @@ class _NoteHomeState extends State<NoteHome> {
   final TextEditingController noteController = TextEditingController();
   List<Map<String, dynamic>> notes = []; // List to store notes with priority
   Priority selectedPriority = Priority.low; // Default priority
+  Priority? selectedFilterPriority;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,7 @@ class _NoteHomeState extends State<NoteHome> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      // Filter notes by priority
+                      selectedFilterPriority = priority; // Set the selected filter priority
                     });
                   },
                   child: Column(
@@ -82,13 +83,14 @@ class _NoteHomeState extends State<NoteHome> {
             const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
-                itemCount: notes.length,
+                itemCount: notes.where((note) => selectedFilterPriority == null || note['priority'] == selectedFilterPriority).length,
                 itemBuilder: (context, index) {
+                  final filteredNotes = notes.where((note) => selectedFilterPriority == null || note['priority'] == selectedFilterPriority).toList();
                   return Card(
-                    color: getPriorityColor(notes[index]['priority']),
+                    color: getPriorityColor(filteredNotes[index]['priority']),
                     child: ListTile(
-                      title: Text(notes[index]['text']),
-                      leading: Icon(getPriorityIcon(notes[index]['priority'])),
+                      title: Text(filteredNotes[index]['text']),
+                      leading: Icon(getPriorityIcon(filteredNotes[index]['priority'])),
                     ),
                   );
                 },
