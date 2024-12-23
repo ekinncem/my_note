@@ -1,193 +1,169 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MyNoteApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyNoteApp extends StatelessWidget {
+  const MyNoteApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Note App',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.blueGrey,
-        colorScheme: ColorScheme.dark(primary: Colors.cyan),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white70),
-        ),
+Widget build(BuildContext context) {
+  return MaterialApp(
+    title: 'My Note',
+    theme: ThemeData.dark().copyWith(
+      primaryColor: Colors.blue,
+      colorScheme: ColorScheme.dark(
+        primary: Colors.blue,
+        secondary: Colors.cyan,
       ),
-      home: const NoteHome(),
-    );
-  }
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    ),
+    home: const NoteHome(),
+  );
+}
+
 }
 
 class NoteHome extends StatefulWidget {
-  const NoteHome({Key? key}) : super(key: key);
+  const NoteHome({super.key});
 
   @override
-  State<NoteHome> createState() => _NoteHomeState();
+  _NoteHomeState createState() => _NoteHomeState();
 }
 
-enum Priority { low, medium, high, alert }
+class Note {
+  String title;
+  String content;
+  DateTime dateCreated;
+  String category;
+  String priority;
+  bool isCompleted;
+  Color color;
+
+  Note({
+    required this.title,
+    required this.content,
+    required this.dateCreated,
+    required this.category,
+    required this.priority,
+    this.isCompleted = false,
+    required this.color,
+  });
+}
 
 class _NoteHomeState extends State<NoteHome> {
-  final TextEditingController noteController = TextEditingController();
-  List<Map<String, dynamic>> notes = []; // List to store notes with priority
-  Priority selectedPriority = Priority.low; // Default priority
-  Priority? selectedFilterPriority;
+  final List<Note> _notes = [];
+  String _selectedFilter = 'All';
+  final List<String> _categories = ['All', 'Home', 'Work', 'Personal'];
+  final List<String> _priorities = ['All', 'Low', 'Medium', 'High'];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Notes')), 
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            // Priority settings at the top
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: Priority.values.map((priority) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedFilterPriority = priority; // Set the selected filter priority
-                    });
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      Icon(getPriorityIcon(priority), color: getPriorityColor(priority)),
-                      Text(priority.toString().split('.').last.toUpperCase()),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                _showNoteDialog();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
-              child: const Text('Create New Note'),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: notes.where((note) => selectedFilterPriority == null || note['priority'] == selectedFilterPriority).length,
-                itemBuilder: (context, index) {
-                  final filteredNotes = notes.where((note) => selectedFilterPriority == null || note['priority'] == selectedFilterPriority).toList();
-                  return Card(
-                    color: getPriorityColor(filteredNotes[index]['priority']),
-                    child: ListTile(
-                      title: Text(filteredNotes[index]['text']),
-                      leading: Icon(getPriorityIcon(filteredNotes[index]['priority'])),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Home':
+        return Colors.orange;
+      case 'Work':
+        return Colors.blue;
+      case 'Personal':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 
   void _showNoteDialog() {
-    String note = '';
-    Priority priority = Priority.low;
-    DateTime selectedDate = DateTime.now();
-    TimeOfDay selectedTime = TimeOfDay.now();
+    final titleController = TextEditingController();
+    final contentController = TextEditingController();
+    String selectedCategory = 'Home';
+    String selectedPriority = 'Low';
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
-          title: const Text('Create New Note'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                onChanged: (value) {
-                  note = value;
-                },
-                decoration: const InputDecoration(hintText: 'Enter your note'),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: Priority.values.map((priorityOption) {
-                  return GestureDetector(
-                    onTap: () {
-                      priority = priorityOption;
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Icon(getPriorityIcon(priorityOption), color: getPriorityColor(priorityOption)),
-                        Text(priorityOption.toString().split('.').last.toUpperCase()),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  final DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null && pickedDate != selectedDate) {
-                    setState(() {
-                      selectedDate = pickedDate;
-                    });
-                  }
-                },
-                child: const Text('Select Date'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  final TimeOfDay? pickedTime = await showTimePicker(
-                    context: context,
-                    initialTime: selectedTime,
-                  );
-                  if (pickedTime != null && pickedTime != selectedTime) {
-                    setState(() {
-                      selectedTime = pickedTime;
-                    });
-                  }
-                },
-                child: const Text('Select Time'),
-              ),
-            ],
+          title: const Text('Add Note'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: contentController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Content',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _categories
+                      .where((category) => category != 'All')
+                      .map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    selectedCategory = value!;
+                  },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedPriority,
+                  decoration: const InputDecoration(
+                    labelText: 'Priority',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _priorities.map((priority) {
+                    return DropdownMenuItem(
+                      value: priority,
+                      child: Text(priority),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    selectedPriority = value!;
+                  },
+                ),
+              ],
+            ),
           ),
-          actions: <Widget>[
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
             TextButton(
               onPressed: () {
-                if (note.isNotEmpty) {
-                  String dateTime = '$selectedDate ${selectedTime.format(context)}';
+                if (titleController.text.isNotEmpty) {
                   setState(() {
-                    notes.add({
-                      'text': '[$dateTime] $note',
-                      'priority': priority,
-                    });
+                    _notes.add(Note(
+                      title: titleController.text,
+                      content: contentController.text,
+                      dateCreated: DateTime.now(),
+                      category: selectedCategory,
+                      priority: selectedPriority,
+                      color: _getCategoryColor(selectedCategory),
+                    ));
                   });
+                  Navigator.pop(context);
                 }
-                Navigator.of(context).pop();
               },
-              child: const Text('Save'),
+              child: const Text('ADD'),
             ),
           ],
         );
@@ -195,33 +171,163 @@ class _NoteHomeState extends State<NoteHome> {
     );
   }
 
-  IconData getPriorityIcon(Priority priority) {
-    switch (priority) {
-      case Priority.low:
-        return Icons.low_priority;
-      case Priority.medium:
-        return Icons.priority_high;
-      case Priority.high:
-        return Icons.warning;
-      case Priority.alert:
-        return Icons.error;
-      default:
-        return Icons.info;
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+    final filteredNotes = _selectedFilter == 'All'
+        ? _notes
+        : _selectedFilter.contains('Low') || _selectedFilter.contains('Medium') || _selectedFilter.contains('High')
+            ? _notes.where((note) => note.priority == _selectedFilter).toList()
+            : _notes.where((note) => note.category == _selectedFilter).toList();
 
-  Color getPriorityColor(Priority priority) {
-    switch (priority) {
-      case Priority.low:
-        return Colors.green;
-      case Priority.medium:
-        return Colors.yellow;
-      case Priority.high:
-        return Colors.orange;
-      case Priority.alert:
-        return Colors.red;
-      default:
-        return Colors.white;
-    }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Notes'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                ..._categories.map((category) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text(category),
+                      selected: _selectedFilter == category,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedFilter = category;
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+                ..._priorities.map((priority) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text(priority),
+                      selected: _selectedFilter == priority,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedFilter = priority;
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search notes...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: _notes.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 16),
+                        const Text(
+                          "You don't have any notes",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: filteredNotes.length,
+                    itemBuilder: (context, index) {
+                      final note = filteredNotes[index];
+                      return Card(
+                        color: note.color.withOpacity(0.2),
+                        child: ListTile(
+                          leading: Checkbox(
+                            value: note.isCompleted,
+                            onChanged: (value) {
+                              setState(() {
+                                note.isCompleted = value!;
+                              });
+                            },
+                          ),
+                          title: Text(
+                            note.title,
+                            style: TextStyle(
+                              decoration: note.isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                note.content,
+                                style: TextStyle(
+                                  decoration: note.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                DateFormat('MMM dd, yyyy')
+                                    .format(note.dateCreated),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  // Implement edit functionality
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _notes.remove(note);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showNoteDialog,
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
