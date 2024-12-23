@@ -32,9 +32,12 @@ class NoteHome extends StatefulWidget {
   State<NoteHome> createState() => _NoteHomeState();
 }
 
+enum Priority { low, medium, high, alert }
+
 class _NoteHomeState extends State<NoteHome> {
   final TextEditingController noteController = TextEditingController();
-  List<String> notes = []; // Notları saklamak için liste
+  List<Map<String, dynamic>> notes = []; // List to store notes with priority
+  Priority selectedPriority = Priority.low; // Default priority
 
   @override
   Widget build(BuildContext context) {
@@ -44,31 +47,29 @@ class _NoteHomeState extends State<NoteHome> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: noteController,
-              maxLines: 10,
-              decoration: InputDecoration(
-                hintText: 'Write your note here...',
-                filled: true,
-                fillColor: Colors.black54,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+            // Priority settings at the top
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: Priority.values.map((priority) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      // Filter notes by priority
+                    });
+                  },
+                  child: Column(
+                    children: <Widget>[
+                      Icon(getPriorityIcon(priority), color: getPriorityColor(priority)),
+                      Text(priority.toString().split('.').last.toUpperCase()),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Create a new note with date and time
-                String note = noteController.text;
-                if (note.isNotEmpty) {
-                  String dateTime = DateTime.now().toString();
-                  setState(() {
-                    notes.add('[$dateTime] $note');
-                  });
-                  noteController.clear();
-                }
+                _showNoteDialog();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
@@ -84,9 +85,10 @@ class _NoteHomeState extends State<NoteHome> {
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
                   return Card(
-                    color: Colors.cyan,
+                    color: getPriorityColor(notes[index]['priority']),
                     child: ListTile(
-                      title: Text(notes[index]),
+                      title: Text(notes[index]['text']),
+                      leading: Icon(getPriorityIcon(notes[index]['priority'])),
                     ),
                   );
                 },
@@ -96,5 +98,128 @@ class _NoteHomeState extends State<NoteHome> {
         ),
       ),
     );
+  }
+
+  void _showNoteDialog() {
+    String note = '';
+    Priority priority = Priority.low;
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create New Note'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                onChanged: (value) {
+                  note = value;
+                },
+                decoration: const InputDecoration(hintText: 'Enter your note'),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: Priority.values.map((priorityOption) {
+                  return GestureDetector(
+                    onTap: () {
+                      priority = priorityOption;
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Icon(getPriorityIcon(priorityOption), color: getPriorityColor(priorityOption)),
+                        Text(priorityOption.toString().split('.').last.toUpperCase()),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  final DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    setState(() {
+                      selectedDate = pickedDate;
+                    });
+                  }
+                },
+                child: const Text('Select Date'),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  final TimeOfDay? pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: selectedTime,
+                  );
+                  if (pickedTime != null && pickedTime != selectedTime) {
+                    setState(() {
+                      selectedTime = pickedTime;
+                    });
+                  }
+                },
+                child: const Text('Select Time'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                if (note.isNotEmpty) {
+                  String dateTime = '$selectedDate ${selectedTime.format(context)}';
+                  setState(() {
+                    notes.add({
+                      'text': '[$dateTime] $note',
+                      'priority': priority,
+                    });
+                  });
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  IconData getPriorityIcon(Priority priority) {
+    switch (priority) {
+      case Priority.low:
+        return Icons.low_priority;
+      case Priority.medium:
+        return Icons.priority_high;
+      case Priority.high:
+        return Icons.warning;
+      case Priority.alert:
+        return Icons.error;
+      default:
+        return Icons.info;
+    }
+  }
+
+  Color getPriorityColor(Priority priority) {
+    switch (priority) {
+      case Priority.low:
+        return Colors.green;
+      case Priority.medium:
+        return Colors.yellow;
+      case Priority.high:
+        return Colors.orange;
+      case Priority.alert:
+        return Colors.red;
+      default:
+        return Colors.white;
+    }
   }
 }
