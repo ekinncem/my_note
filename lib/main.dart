@@ -515,3 +515,59 @@ class _NoteHomeState extends State<NoteHome> {
     );
   }
 }
+
+class CreateNoteForm extends StatelessWidget {
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController contentController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Create New Note',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          TextField(
+            controller: titleController,
+            decoration: InputDecoration(
+              labelText: 'Title',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.title),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          TextField(
+            controller: contentController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelText: 'Content',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.note),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          ElevatedButton(
+            onPressed: () {
+              // Handle save note action
+            },
+            child: Text('Save Note'),
+          ),
+        ],
+      ),
+    );
+  }
+}
