@@ -1,5 +1,8 @@
+// ignore_for_file: sort_child_properties_last
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'note_models.dart';
 
 void main() {
   runApp(const MyNoteApp());
@@ -30,26 +33,6 @@ class NoteHome extends StatefulWidget {
 
   @override
   _NoteHomeState createState() => _NoteHomeState();
-}
-
-class Note {
-  String title;
-  String content;
-  DateTime dateCreated;
-  String category;
-  String priority;
-  bool isCompleted;
-  Color color;
-
-  Note({
-    required this.title,
-    required this.content,
-    required this.dateCreated,
-    required this.category,
-    required this.priority,
-    this.isCompleted = false,
-    required this.color,
-  });
 }
 
 class _NoteHomeState extends State<NoteHome> {
@@ -276,6 +259,7 @@ class _NoteHomeState extends State<NoteHome> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     final filteredNotes = _selectedFilter == 'All'
         ? _notes
         : _selectedFilter.contains('Low') ||
@@ -284,254 +268,250 @@ class _NoteHomeState extends State<NoteHome> {
             ? _notes.where((note) => note.priority == _selectedFilter).toList()
             : _notes.where((note) => note.category == _selectedFilter).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'My Notes',
-          style: TextStyle(fontWeight: FontWeight.bold),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05, vertical: screenSize.height * 0.02),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'My Notes',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          elevation: 0,
         ),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ..._categories.map((category) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(category),
-                        selected: _selectedFilter == category,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedFilter = category;
-                          });
-                        },
-                        avatar: Icon(
-                          category == 'Home'
-                              ? Icons.home
-                              : category == 'Work'
-                                  ? Icons.work
-                                  : category == 'Personal'
-                                      ? Icons.person
-                                      : Icons.all_inbox,
+        body: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ..._categories.map((category) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterChip(
+                          label: Text(category),
+                          selected: _selectedFilter == category,
+                          onSelected: (selected) {
+                            setState(() {
+                              _selectedFilter = category;
+                            });
+                          },
+                          avatar: Icon(
+                            category == 'Home'
+                                ? Icons.home
+                                : category == 'Work'
+                                    ? Icons.work
+                                    : category == 'Personal'
+                                        ? Icons.person
+                                        : Icons.all_inbox,
+                          ),
                         ),
-                      ),
-                    );
-                  }),
-                  ..._priorities.map((priority) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(priority),
-                        selected: _selectedFilter == priority,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedFilter = priority;
-                          });
-                        },
-                        avatar: Icon(
-                          priority == 'High'
-                              ? Icons.warning
-                              : priority == 'Medium'
-                                  ? Icons.priority_high
-                                  : priority == 'Low'
-                                      ? Icons.low_priority
-                                      : Icons.all_inbox,
-                          color: priority == 'High'
-                              ? Colors.red
-                              : priority == 'Medium'
-                                  ? Colors.orange
-                                  : priority == 'Low'
-                                      ? Colors.green
-                                      : null,
+                      );
+                    }),
+                    ..._priorities.map((priority) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterChip(
+                          label: Text(priority),
+                          selected: _selectedFilter == priority,
+                          onSelected: (selected) {
+                            setState(() {
+                              _selectedFilter = priority;
+                            });
+                          },
+                          avatar: Icon(
+                            priority == 'High'
+                                ? Icons.warning
+                                : priority == 'Medium'
+                                    ? Icons.priority_high
+                                    : priority == 'Low'
+                                        ? Icons.low_priority
+                                        : Icons.all_inbox,
+                            color: priority == 'High'
+                                ? Colors.red
+                                : priority == 'Medium'
+                                    ? Colors.orange
+                                    : priority == 'Low'
+                                        ? Colors.green
+                                        : null,
+                          ),
                         ),
-                      ),
-                    );
-                  }),
-                ],
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: _notes.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.note_add,
-                          size: 64,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "You don't have any notes",
-                          style: TextStyle(
-                            fontSize: 20,
+            Expanded(
+              child: _notes.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.note_add,
+                            size: 64,
                             color: Colors.grey,
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.add),
-                          label: const Text('Create Your First Note'),
-                          onPressed: _showNoteDialog,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 16),
+                          const Text(
+                            "You don't have any notes",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.grey,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.all(2),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 6,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 2,
-                      mainAxisSpacing: 2,
-                    ),
-                    itemCount: filteredNotes.length,
-                    itemBuilder: (context, index) {
-                      final note = filteredNotes[index];
-                      return Card(
-                        elevation: 4,
-                        color: note.color,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            // Implement note details view
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(2),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Icon(
-                                      note.priority == 'High'
-                                          ? Icons.warning
-                                          : note.priority == 'Medium'
-                                              ? Icons.priority_high
-                                              : Icons.low_priority,
-                                      color: note.priority == 'High'
-                                          ? Colors.red
-                                          : note.priority == 'Medium'
-                                              ? Colors.orange
-                                              : Colors.green,
-                                      size: 16,
-                                    ),
-                                    Transform.scale(
-                                      scale: 0.8,
-                                      child: Checkbox(
-                                        value: note.isCompleted,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            note.isCompleted = value!;
-                                          });
-                                        },
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Create Your First Note'),
+                            onPressed: _showNoteDialog,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(2),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 6,
+                        childAspectRatio: 0.8,
+                        crossAxisSpacing: 2,
+                        mainAxisSpacing: 2,
+                      ),
+                      itemCount: filteredNotes.length,
+                      itemBuilder: (context, index) {
+                        final note = filteredNotes[index];
+                        return Card(
+                          elevation: 4,
+                          color: note.color,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              // Implement note details view
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(
+                                        note.priority == 'High'
+                                            ? Icons.warning
+                                            : note.priority == 'Medium'
+                                                ? Icons.priority_high
+                                                : Icons.low_priority,
+                                        color: note.priority == 'High'
+                                            ? Colors.red
+                                            : note.priority == 'Medium'
+                                                ? Colors.orange
+                                                : Colors.green,
+                                        size: 16,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  note.title,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: note.isCompleted
-                                        ? TextDecoration.lineThrough
-                                        : null,
+                                      Transform.scale(
+                                        scale: 0.8,
+                                        child: Checkbox(
+                                          value: note.isCompleted,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              note.isCompleted = value!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 1),
-                                Expanded(
-                                  child: Text(
-                                    note.content,
+                                  const SizedBox(height: 1),
+                                  Text(
+                                    note.title,
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
                                       decoration: note.isCompleted
                                           ? TextDecoration.lineThrough
                                           : null,
                                     ),
-                                    maxLines: 2,
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      DateFormat('MMM dd').format(note.dateCreated),
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey,
+                                  const SizedBox(height: 1),
+                                  Expanded(
+                                    child: Text(
+                                      note.content,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        decoration: note.isCompleted
+                                            ? TextDecoration.lineThrough
+                                            : null,
                                       ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          iconSize: 16,
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                          icon: const Icon(Icons.edit),
-                                          onPressed: () {
-                                            _editNoteDialog(note);
-                                          },
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        DateFormat('MMM dd').format(note.dateCreated),
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey,
                                         ),
-                                        const SizedBox(width: 2),
-                                        IconButton(
-                                          iconSize: 16,
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () {
-                                            setState(() {
-                                              _notes.remove(note);
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            iconSize: 16,
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            icon: const Icon(Icons.edit),
+                                            onPressed: () {
+                                              _editNoteDialog(note);
+                                            },
+                                          ),
+                                          const SizedBox(width: 2),
+                                          IconButton(
+                                            iconSize: 16,
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            icon: const Icon(Icons.delete),
+                                            onPressed: () {
+                                              setState(() {
+                                                _notes.remove(note);
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: _notes.isNotEmpty
-          ? FloatingActionButton.extended(
-              onPressed: _showNoteDialog,
-              label: const Text('Create Note'),
-              icon: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 }
