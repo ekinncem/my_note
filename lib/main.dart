@@ -353,24 +353,26 @@ class _NoteHomeState extends State<NoteHome> {
             ? _notes.where((note) => note.priority == _selectedFilter).toList()
             : _notes.where((note) => note.category == _selectedFilter).toList();
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05, vertical: screenSize.height * 0.02),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'My Notes',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.filter_list),
-              onPressed: _openFilterMenu,
-            ),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'My Notes',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        body: Column(
+        centerTitle: true,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: _openFilterMenu,
+          ),
+        ],
+      ),
+      body: Container(
+        width: screenSize.width,
+        height: screenSize.height,
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05, vertical: screenSize.height * 0.02),
+        child: Column(
           children: [
             Expanded(
               child: _notes.isEmpty
@@ -425,6 +427,7 @@ class _NoteHomeState extends State<NoteHome> {
                               },
                               child: Container(
                                 width: screenSize.width * 0.3,
+                                height: screenSize.width * 0.3, // Make the note square
                                 padding: const EdgeInsets.all(8),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
