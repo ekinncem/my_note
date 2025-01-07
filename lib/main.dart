@@ -409,132 +409,127 @@ class _NoteHomeState extends State<NoteHome> {
                         ],
                       ),
                     )
-                  : GridView.builder(
-                      padding: const EdgeInsets.all(2),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 6,
-                        childAspectRatio: 0.8,
-                        crossAxisSpacing: 2,
-                        mainAxisSpacing: 2,
-                      ),
-                      itemCount: filteredNotes.length,
-                      itemBuilder: (context, index) {
-                        final note = filteredNotes[index];
-                        return Card(
-                          elevation: 4,
-                          color: note.color,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              // Implement note details view
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Icon(
-                                        note.priority == 'High'
-                                            ? Icons.warning
-                                            : note.priority == 'Medium'
-                                                ? Icons.priority_high
-                                                : Icons.low_priority,
-                                        color: note.priority == 'High'
-                                            ? Colors.red
-                                            : note.priority == 'Medium'
-                                                ? Colors.orange
-                                                : Colors.green,
-                                        size: 16,
-                                      ),
-                                      Transform.scale(
-                                        scale: 0.8,
-                                        child: Checkbox(
-                                          value: note.isCompleted,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              note.isCompleted = value!;
-                                            });
-                                          },
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: filteredNotes.map((note) {
+                          return Card(
+                            elevation: 4,
+                            color: note.color,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                // Implement note details view
+                              },
+                              child: Container(
+                                width: screenSize.width * 0.3,
+                                padding: const EdgeInsets.all(8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Icon(
+                                          note.priority == 'High'
+                                              ? Icons.warning
+                                              : note.priority == 'Medium'
+                                                  ? Icons.priority_high
+                                                  : Icons.low_priority,
+                                          color: note.priority == 'High'
+                                              ? Colors.red
+                                              : note.priority == 'Medium'
+                                                  ? Colors.orange
+                                                  : Colors.green,
+                                          size: 16,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 1),
-                                  Text(
-                                    note.title,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: note.isCompleted
-                                          ? TextDecoration.lineThrough
-                                          : null,
+                                        Transform.scale(
+                                          scale: 0.8,
+                                          child: Checkbox(
+                                            value: note.isCompleted,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                note.isCompleted = value!;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 1),
-                                  Expanded(
-                                    child: Text(
-                                      note.content,
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      note.title,
                                       style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                         decoration: note.isCompleted
                                             ? TextDecoration.lineThrough
                                             : null,
                                       ),
-                                      maxLines: 2,
+                                      maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        DateFormat('MMM dd').format(note.dateCreated),
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.grey,
+                                    const SizedBox(height: 4),
+                                    Expanded(
+                                      child: Text(
+                                        note.content,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          decoration: note.isCompleted
+                                              ? TextDecoration.lineThrough
+                                              : null,
                                         ),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            iconSize: 16,
-                                            padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(),
-                                            icon: const Icon(Icons.edit),
-                                            onPressed: () {
-                                              _editNoteDialog(note);
-                                            },
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          DateFormat('MMM dd').format(note.dateCreated),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
                                           ),
-                                          const SizedBox(width: 2),
-                                          IconButton(
-                                            iconSize: 16,
-                                            padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(),
-                                            icon: const Icon(Icons.delete),
-                                            onPressed: () {
-                                              setState(() {
-                                                _notes.remove(note);
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              iconSize: 16,
+                                              padding: EdgeInsets.zero,
+                                              constraints: const BoxConstraints(),
+                                              icon: const Icon(Icons.edit),
+                                              onPressed: () {
+                                                _editNoteDialog(note);
+                                              },
+                                            ),
+                                            const SizedBox(width: 4),
+                                            IconButton(
+                                              iconSize: 16,
+                                              padding: EdgeInsets.zero,
+                                              constraints: const BoxConstraints(),
+                                              icon: const Icon(Icons.delete),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _notes.remove(note);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        }).toList(),
+                      ),
                     ),
             ),
           ],
