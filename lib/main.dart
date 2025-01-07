@@ -203,118 +203,121 @@ class _NoteHomeState extends State<NoteHome> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Row(
                           children: filteredNotes.map((note) {
-                            return Card(
-                              elevation: 4,
-                              color: note.color,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: InkWell(
-                                onTap: () {
-                                  // Implement note details view
-                                },
-                                child: Container(
-                                  width: screenSize.width * 0.3,
-                                  height: screenSize.width * 0.3, // Make the note square
-                                  padding: const EdgeInsets.all(8),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Icon(
-                                            note.priority == 'High'
-                                                ? Icons.warning
-                                                : note.priority == 'Medium'
-                                                    ? Icons.priority_high
-                                                    : Icons.low_priority,
-                                            color: note.priority == 'High'
-                                                ? Colors.red
-                                                : note.priority == 'Medium'
-                                                    ? Colors.orange
-                                                    : Colors.green,
-                                            size: 16,
-                                          ),
-                                          Transform.scale(
-                                            scale: 0.8,
-                                            child: Checkbox(
-                                              value: note.isCompleted,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  note.isCompleted = value!;
-                                                });
-                                              },
+                            return Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Card(
+                                elevation: 4,
+                                color: note.color,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    // Implement note details view
+                                  },
+                                  child: Container(
+                                    width: screenSize.width * 0.3,
+                                    height: screenSize.width * 0.3, // Make the note square
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Icon(
+                                              note.priority == 'High'
+                                                  ? Icons.warning
+                                                  : note.priority == 'Medium'
+                                                      ? Icons.priority_high
+                                                      : Icons.low_priority,
+                                              color: note.priority == 'High'
+                                                  ? Colors.red
+                                                  : note.priority == 'Medium'
+                                                      ? Colors.orange
+                                                      : Colors.green,
+                                              size: 16,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        note.title,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          decoration: note.isCompleted
-                                              ? TextDecoration.lineThrough
-                                              : null,
+                                            Transform.scale(
+                                              scale: 0.8,
+                                              child: Checkbox(
+                                                value: note.isCompleted,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    note.isCompleted = value!;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Expanded(
-                                        child: Text(
-                                          note.content,
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          note.title,
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
                                             decoration: note.isCompleted
                                                 ? TextDecoration.lineThrough
                                                 : null,
                                           ),
-                                          maxLines: 3,
+                                          maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            DateFormat('MMM dd').format(note.dateCreated),
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey,
+                                        const SizedBox(height: 4),
+                                        Expanded(
+                                          child: Text(
+                                            note.content,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              decoration: note.isCompleted
+                                                  ? TextDecoration.lineThrough
+                                                  : null,
                                             ),
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                iconSize: 16,
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                icon: const Icon(Icons.edit),
-                                                onPressed: () {
-                                                  _editNoteDialog(note);
-                                                },
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              DateFormat('MMM dd').format(note.dateCreated),
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
                                               ),
-                                              const SizedBox(width: 4),
-                                              IconButton(
-                                                iconSize: 16,
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                icon: const Icon(Icons.delete),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _notes.remove(note);
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                  iconSize: 16,
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: const BoxConstraints(),
+                                                  icon: const Icon(Icons.edit),
+                                                  onPressed: () {
+                                                    _editNoteDialog(note);
+                                                  },
+                                                ),
+                                                const SizedBox(width: 4),
+                                                IconButton(
+                                                  iconSize: 16,
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: const BoxConstraints(),
+                                                  icon: const Icon(Icons.delete),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _notes.remove(note);
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -326,62 +329,6 @@ class _NoteHomeState extends State<NoteHome> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CreateNoteForm extends StatelessWidget {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Create New Note',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          TextField(
-            controller: titleController,
-            decoration: InputDecoration(
-              labelText: 'Title',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              prefixIcon: const Icon(Icons.title),
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          TextField(
-            controller: contentController,
-            maxLines: 3,
-            decoration: InputDecoration(
-              labelText: 'Content',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              prefixIcon: const Icon(Icons.note),
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          ElevatedButton(
-            onPressed: () {
-              // Handle save note action
-            },
-            child: Text('Save Note'),
-          ),
-        ],
       ),
     );
   }
