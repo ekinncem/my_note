@@ -200,11 +200,11 @@ class _NoteHomeState extends State<NoteHome> {
                   : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Column(
                           children: filteredNotes.map((note) {
                             return Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                              margin: const EdgeInsets.symmetric(horizontal: 4.0),
                               child: Card(
                                 elevation: 4,
                                 color: note.color,
@@ -216,8 +216,8 @@ class _NoteHomeState extends State<NoteHome> {
                                     // Implement note details view
                                   },
                                   child: Container(
-                                    width: screenSize.width * 0.3,
-                                    height: screenSize.width * 0.3, // Make the note square
+                                    width: screenSize.width * 0.35,
+                                    height: screenSize.width * 0.35, // Increase the size of the note square
                                     padding: const EdgeInsets.all(8),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
