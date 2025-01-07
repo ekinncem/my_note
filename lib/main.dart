@@ -82,129 +82,131 @@ class _NoteHomeState extends State<NoteHome> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Create New Note',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    labelText: 'Title',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Create New Note',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                    prefixIcon: const Icon(Icons.title),
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: contentController,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: 'Content',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    prefixIcon: const Icon(Icons.note),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: selectedCategory,
-                  decoration: InputDecoration(
-                    labelText: 'Category',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    prefixIcon: const Icon(Icons.category),
-                  ),
-                  items: _categories
-                      .where((category) => category != 'All')
-                      .map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    selectedCategory = value!;
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: selectedPriority,
-                  decoration: InputDecoration(
-                    labelText: 'Priority',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    prefixIcon: const Icon(Icons.priority_high),
-                  ),
-                  items: _priorities
-                      .where((priority) => priority != 'All')
-                      .map((priority) {
-                    return DropdownMenuItem(
-                      value: priority,
-                      child: Text(priority),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    selectedPriority = value!;
-                  },
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
-                    ),
-                    const SizedBox(width: 16),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.add),
-                      label: const Text('Create Note'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Title',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      onPressed: () {
-                        if (titleController.text.isNotEmpty) {
-                          setState(() {
-                            _notes.add(Note(
-                              title: titleController.text,
-                              content: contentController.text,
-                              dateCreated: DateTime.now(),
-                              category: selectedCategory,
-                              priority: selectedPriority,
-                              color: _getRandomColor(),
-                            ));
-                            print('Note added: ${titleController.text}');
-                            print('Total notes: ${_notes.length}');
-                          });
-                          Navigator.pop(context);
-                        }
-                      },
+                      prefixIcon: const Icon(Icons.title),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: contentController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: 'Content',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon: const Icon(Icons.note),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedCategory,
+                    decoration: InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon: const Icon(Icons.category),
+                    ),
+                    items: _categories
+                        .where((category) => category != 'All')
+                        .map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      selectedCategory = value!;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedPriority,
+                    decoration: InputDecoration(
+                      labelText: 'Priority',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon: const Icon(Icons.priority_high),
+                    ),
+                    items: _priorities
+                        .where((priority) => priority != 'All')
+                        .map((priority) {
+                      return DropdownMenuItem(
+                        value: priority,
+                        child: Text(priority),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      selectedPriority = value!;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      const SizedBox(width: 16),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create Note'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          if (titleController.text.isNotEmpty) {
+                            setState(() {
+                              _notes.add(Note(
+                                title: titleController.text,
+                                content: contentController.text,
+                                dateCreated: DateTime.now(),
+                                category: selectedCategory,
+                                priority: selectedPriority,
+                                color: _getRandomColor(),
+                              ));
+                              print('Note added: ${titleController.text}');
+                              print('Total notes: ${_notes.length}');
+                            });
+                            Navigator.pop(context);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -257,6 +259,89 @@ class _NoteHomeState extends State<NoteHome> {
     );
   }
 
+  void _openFilterMenu() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Filter Notes',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Categories'),
+              Wrap(
+                spacing: 8,
+                children: _categories.map((category) {
+                  return FilterChip(
+                    label: Text(category),
+                    selected: _selectedFilter == category,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = category;
+                      });
+                      Navigator.pop(context);
+                    },
+                    avatar: Icon(
+                      category == 'Home'
+                          ? Icons.home
+                          : category == 'Work'
+                              ? Icons.work
+                              : category == 'Personal'
+                                  ? Icons.person
+                                  : Icons.all_inbox,
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              const Text('Priorities'),
+              Wrap(
+                spacing: 8,
+                children: _priorities.map((priority) {
+                  return FilterChip(
+                    label: Text(priority),
+                    selected: _selectedFilter == priority,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = priority;
+                      });
+                      Navigator.pop(context);
+                    },
+                    avatar: Icon(
+                      priority == 'High'
+                          ? Icons.warning
+                          : priority == 'Medium'
+                              ? Icons.priority_high
+                              : priority == 'Low'
+                                  ? Icons.low_priority
+                                  : Icons.all_inbox,
+                      color: priority == 'High'
+                          ? Colors.red
+                          : priority == 'Medium'
+                              ? Colors.orange
+                              : priority == 'Low'
+                                  ? Colors.green
+                                  : null,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -278,72 +363,15 @@ class _NoteHomeState extends State<NoteHome> {
           ),
           centerTitle: true,
           elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.filter_list),
+              onPressed: _openFilterMenu,
+            ),
+          ],
         ),
         body: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ..._categories.map((category) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: FilterChip(
-                          label: Text(category),
-                          selected: _selectedFilter == category,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedFilter = category;
-                            });
-                          },
-                          avatar: Icon(
-                            category == 'Home'
-                                ? Icons.home
-                                : category == 'Work'
-                                    ? Icons.work
-                                    : category == 'Personal'
-                                        ? Icons.person
-                                        : Icons.all_inbox,
-                          ),
-                        ),
-                      );
-                    }),
-                    ..._priorities.map((priority) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: FilterChip(
-                          label: Text(priority),
-                          selected: _selectedFilter == priority,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedFilter = priority;
-                            });
-                          },
-                          avatar: Icon(
-                            priority == 'High'
-                                ? Icons.warning
-                                : priority == 'Medium'
-                                    ? Icons.priority_high
-                                    : priority == 'Low'
-                                        ? Icons.low_priority
-                                        : Icons.all_inbox,
-                            color: priority == 'High'
-                                ? Colors.red
-                                : priority == 'Medium'
-                                    ? Colors.orange
-                                    : priority == 'Low'
-                                        ? Colors.green
-                                        : null,
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
             Expanded(
               child: _notes.isEmpty
                   ? Center(
